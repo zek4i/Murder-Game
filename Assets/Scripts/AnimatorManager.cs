@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class AnimatorManager : MonoBehaviour
 {
+    PlayerManager playerManager;
     Animator animator;
     int horizontal;
     int vertical;
     private void Awake()
     {
+        playerManager = GetComponent<PlayerManager>();
         animator = GetComponent<Animator>();
         horizontal = Animator.StringToHash("Horizontal"); //now we are referencing the horizontal and vertical values of the parameter int the animator
         vertical = Animator.StringToHash("Vertical");
+    }
+    public void PlayTargetAnimation(string targetAnimation, bool isInteracting)
+    {
+        animator.SetBool("isInteracting" ,isInteracting);
+        animator.CrossFade(targetAnimation, 0.2f);
     }
     public void UpdateAnimatorValues(float horizontalMovement, float verticalMovement, bool isSprinting, bool isWalking)
     {
@@ -78,6 +85,7 @@ public class AnimatorManager : MonoBehaviour
         animator.SetFloat(horizontal, snappedHorizontal, 0.1f, Time.deltaTime);
         animator.SetFloat(vertical, snappedVertical, 0.1f, Time.deltaTime);
 
+        animator.SetBool("isInteracting", playerManager.isInteracting);
 
     }
 }
