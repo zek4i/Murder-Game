@@ -92,6 +92,62 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Player Action",
+            "id": "13409a98-7d45-45fc-b593-800e2b4a1153",
+            "actions": [
+                {
+                    "name": "Shift",
+                    "type": "Button",
+                    "id": "e84928d8-de80-48d5-857c-0b439ba1f7eb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "532393b8-84d6-4bce-8758-26ba2943a536",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shift",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Player Walk",
+            "id": "5424b944-9995-449f-a13b-0de49042fb95",
+            "actions": [
+                {
+                    "name": "Walk",
+                    "type": "Button",
+                    "id": "8b73ee31-1716-490a-9a68-1ffe54be98a5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b71bbc86-20c7-4103-8303-1bbfaf6c324e",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Walk",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

@@ -114,6 +114,62 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Player Action"",
+            ""id"": ""13409a98-7d45-45fc-b593-800e2b4a1153"",
+            ""actions"": [
+                {
+                    ""name"": ""Shift"",
+                    ""type"": ""Button"",
+                    ""id"": ""e84928d8-de80-48d5-857c-0b439ba1f7eb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""532393b8-84d6-4bce-8758-26ba2943a536"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shift"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Player Walk"",
+            ""id"": ""5424b944-9995-449f-a13b-0de49042fb95"",
+            ""actions"": [
+                {
+                    ""name"": ""Walk"",
+                    ""type"": ""Button"",
+                    ""id"": ""8b73ee31-1716-490a-9a68-1ffe54be98a5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""b71bbc86-20c7-4103-8303-1bbfaf6c324e"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Walk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -122,6 +178,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_PlayerMovement = asset.FindActionMap("Player Movement", throwIfNotFound: true);
         m_PlayerMovement_Movement = m_PlayerMovement.FindAction("Movement", throwIfNotFound: true);
         m_PlayerMovement_Camera = m_PlayerMovement.FindAction("Camera", throwIfNotFound: true);
+        // Player Action
+        m_PlayerAction = asset.FindActionMap("Player Action", throwIfNotFound: true);
+        m_PlayerAction_Shift = m_PlayerAction.FindAction("Shift", throwIfNotFound: true);
+        // Player Walk
+        m_PlayerWalk = asset.FindActionMap("Player Walk", throwIfNotFound: true);
+        m_PlayerWalk_Walk = m_PlayerWalk.FindAction("Walk", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -233,9 +295,109 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         }
     }
     public PlayerMovementActions @PlayerMovement => new PlayerMovementActions(this);
+
+    // Player Action
+    private readonly InputActionMap m_PlayerAction;
+    private List<IPlayerActionActions> m_PlayerActionActionsCallbackInterfaces = new List<IPlayerActionActions>();
+    private readonly InputAction m_PlayerAction_Shift;
+    public struct PlayerActionActions
+    {
+        private @PlayerControls m_Wrapper;
+        public PlayerActionActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Shift => m_Wrapper.m_PlayerAction_Shift;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerAction; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PlayerActionActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerActionActions instance)
+        {
+            if (instance == null || m_Wrapper.m_PlayerActionActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerActionActionsCallbackInterfaces.Add(instance);
+            @Shift.started += instance.OnShift;
+            @Shift.performed += instance.OnShift;
+            @Shift.canceled += instance.OnShift;
+        }
+
+        private void UnregisterCallbacks(IPlayerActionActions instance)
+        {
+            @Shift.started -= instance.OnShift;
+            @Shift.performed -= instance.OnShift;
+            @Shift.canceled -= instance.OnShift;
+        }
+
+        public void RemoveCallbacks(IPlayerActionActions instance)
+        {
+            if (m_Wrapper.m_PlayerActionActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IPlayerActionActions instance)
+        {
+            foreach (var item in m_Wrapper.m_PlayerActionActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_PlayerActionActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public PlayerActionActions @PlayerAction => new PlayerActionActions(this);
+
+    // Player Walk
+    private readonly InputActionMap m_PlayerWalk;
+    private List<IPlayerWalkActions> m_PlayerWalkActionsCallbackInterfaces = new List<IPlayerWalkActions>();
+    private readonly InputAction m_PlayerWalk_Walk;
+    public struct PlayerWalkActions
+    {
+        private @PlayerControls m_Wrapper;
+        public PlayerWalkActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Walk => m_Wrapper.m_PlayerWalk_Walk;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerWalk; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PlayerWalkActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerWalkActions instance)
+        {
+            if (instance == null || m_Wrapper.m_PlayerWalkActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerWalkActionsCallbackInterfaces.Add(instance);
+            @Walk.started += instance.OnWalk;
+            @Walk.performed += instance.OnWalk;
+            @Walk.canceled += instance.OnWalk;
+        }
+
+        private void UnregisterCallbacks(IPlayerWalkActions instance)
+        {
+            @Walk.started -= instance.OnWalk;
+            @Walk.performed -= instance.OnWalk;
+            @Walk.canceled -= instance.OnWalk;
+        }
+
+        public void RemoveCallbacks(IPlayerWalkActions instance)
+        {
+            if (m_Wrapper.m_PlayerWalkActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IPlayerWalkActions instance)
+        {
+            foreach (var item in m_Wrapper.m_PlayerWalkActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_PlayerWalkActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public PlayerWalkActions @PlayerWalk => new PlayerWalkActions(this);
     public interface IPlayerMovementActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnCamera(InputAction.CallbackContext context);
+    }
+    public interface IPlayerActionActions
+    {
+        void OnShift(InputAction.CallbackContext context);
+    }
+    public interface IPlayerWalkActions
+    {
+        void OnWalk(InputAction.CallbackContext context);
     }
 }

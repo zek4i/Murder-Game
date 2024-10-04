@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class PlayerLocomotion : MonoBehaviour
 {
     InputManager inputManager;
@@ -9,7 +8,12 @@ public class PlayerLocomotion : MonoBehaviour
     Transform cameraObject;
     Rigidbody playerRigidbody;
 
-    public float movementSpeed = 7;
+    public bool isSprinting;
+    public bool isWalking;
+    [Header("Movement Speeds")]
+    public float walkingSpeed = 1.5f;
+    public float runningSpeed = 5;
+    public float sprintingSpeed = 7;
     public float rotationSpeed = 15;
     private void Awake()
     {
@@ -24,11 +28,32 @@ public class PlayerLocomotion : MonoBehaviour
     }
     private void HandleMovement()
     {
-        moveDirection = cameraObject.forward * inputManager.verticalInput; //MovementInput
-        moveDirection = moveDirection + cameraObject.right *inputManager.horizontalInput;
-        moveDirection.Normalize();
-        moveDirection.y = 0;
-        moveDirection = moveDirection * movementSpeed;
+        moveDirection = cameraObject.forward * inputManager.verticalInput; // Movement input
+        moveDirection += cameraObject.right * inputManager.horizontalInput; // Add horizontal input
+        moveDirection.Normalize(); // Normalize to prevent faster diagonal movement
+        moveDirection.y = 0; // Keep movement on the ground
+
+        if(isWalking) // Check if walking
+    {
+            moveDirection *= walkingSpeed; // Use walking speed
+        }
+        else if (isSprinting)
+        {
+            moveDirection *= sprintingSpeed; // Use sprinting speed
+        }
+        else
+        {
+            // Check if the move amount is high enough to transition to running
+            if (inputManager.moveAmount >= 0.5f)
+            {
+                moveDirection *= runningSpeed; // Use running speed for high movement input
+            }
+            else
+            {
+                moveDirection *= walkingSpeed; // Default to walking speed
+            }
+        }
+
 
         Vector3 movementVelocity = moveDirection;
         playerRigidbody.velocity = movementVelocity;
@@ -40,15 +65,12 @@ public class PlayerLocomotion : MonoBehaviour
         targetDirection = targetDirection + cameraObject.right * inputManager.horizontalInput;
         targetDirection.Normalize();
         targetDirection.y = 0;
-
-        if(targetDirection == Vector3.zero)
+        if (targetDirection == Vector3.zero)
         {
             targetDirection = transform.forward; //when we stop moving keep the position of the player to the current position
         }
-
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-
         transform.rotation = playerRotation;
     }
 }
